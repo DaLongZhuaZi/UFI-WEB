@@ -9,7 +9,9 @@ TUNNEL="${CLOUDFLARED_TUNNEL:-}"
 TOKEN="${CLOUDFLARED_TOKEN:-}"
 export LANG="${LANG:-zh_CN.UTF-8}" LC_ALL="${LC_ALL:-C.UTF-8}"
 test -x "$BIN" || { echo "cloudflared 未找到: $BIN" >&2; exit 1; }
-test -f "$CONFIG" || { echo "Cloudflare 配置不存在: $CONFIG" >&2; exit 1; }
+if test -z "$TOKEN"; then
+  test -f "$CONFIG" || { echo "Cloudflare 配置不存在: $CONFIG" >&2; exit 1; }
+fi
 cd "$BASE"
 mkdir -p "$BASE/logs"
 if test -n "$TOKEN"; then

@@ -24,13 +24,28 @@ Cloudflare Tunnel 的 origin 使用 `http://127.0.0.1:3000`。
 
 ## Cloudflare Tunnel 与 TUI
 
-Cloudflare Tunnel 作为独立的 `cloudflared` runit 服务运行。配置文件、credentials 和 token 只放在设备本地：
+Cloudflare Tunnel 作为独立的 `cloudflared` runit 服务运行。你可以使用 Cloudflare 提供的 token 模式；token 只放在设备本地，不需要 `config.yml`：
 
 ```bash
 mkdir -p ~/.config/ufi-web "$PREFIX/var/service/cloudflared"
 cp deploy/cloudflared.env.example ~/.config/ufi-web/cloudflared.env
 chmod 600 ~/.config/ufi-web/cloudflared.env
 ```
+
+编辑 `~/.config/ufi-web/cloudflared.env`：
+
+```bash
+export CLOUDFLARED_BIN="$PREFIX/bin/cloudflared"
+export CLOUDFLARED_TOKEN="你的TunnelToken"
+```
+
+该 token 对应 Cloudflare 命令中的：
+
+```text
+cloudflared.exe service install <TOKEN>
+```
+
+Termux 下不执行 Windows 的 `service install`，而是由 runit 使用同一个 token 启动 Tunnel。
 
 将 `deploy/service/cloudflared/run` 复制到 `$PREFIX/var/service/cloudflared/run`，把 `config.yml` 放在 `~/.cloudflared/config.yml`，然后：
 
