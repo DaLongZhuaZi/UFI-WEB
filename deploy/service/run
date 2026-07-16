@@ -2,5 +2,5 @@
 set -Eeuo pipefail
 BASE="${BASE:-$HOME/services/ufi-web}"
 cd "$BASE/current"
-export APP_ROOT="$PWD" PUBLIC_DIR="$PWD/public" PORT="${PORT:-3000}" HOST="127.0.0.1" APP_VERSION="$(basename "$PWD")"
+export APP_ROOT="$PWD" PUBLIC_DIR="$PWD/public" PORT="${PORT:-3000}" HOST="${HOST:-0.0.0.0}" APP_VERSION="$(basename "$PWD")"
 exec node server-dist/index.js 2>&1
