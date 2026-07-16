@@ -1,0 +1,32 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -Eeuo pipefail
+export LANG="${LANG:-zh_CN.UTF-8}" LC_ALL="${LC_ALL:-C.UTF-8}"
+BASE="${BASE:-$HOME/services/ufi-web}"
+WEB_SERVICE="ufi-web"; CF_SERVICE="cloudflared"
+UPDATER="$BASE/updater/update.sh"; ROLLBACK="$BASE/updater/rollback.sh"
+LOG_DIR="${LOG_BASE:-$BASE/logs}"
+mkdir -p "$LOG_DIR"
+touch "$LOG_DIR/web.log" "$LOG_DIR/cloudflared.log"
+status() { sv status "$1" 2>&1 || true; }
+msg() { dialog --title "UFI Web" --msgbox "$1" 10 70; }
+while true; do
+  choice=$(dialog --stdout --clear --title "UFI Web 管理中心" --menu "选择操作" 20 78 12 \
+    1 "启动 Web 服务" 2 "停止 Web 服务" 3 "重启 Web 服务" \
+    4 "启动 Cloudflare Tunnel" 5 "停止 Cloudflare Tunnel" 6 "重启 Cloudflare Tunnel" \
+    7 "查看服务状态" 8 "检查并更新版本" 9 "回滚版本" \
+    10 "查看 Web 日志" 11 "查看 Tunnel 日志" 12 "退出" 2>/tmp/ufi-dialog.err) || exit 0
+  case "$choice" in
+    1) sv up "$WEB_SERVICE"; msg "Web 服务启动命令已执行。";;
+    2) sv down "$WEB_SERVICE"; msg "Web 服务停止命令已执行。";;
+    3) sv restart "$WEB_SERVICE"; msg "Web 服务重启命令已执行。";;
+    4) sv up "$CF_SERVICE"; msg "Cloudflare Tunnel 启动命令已执行。";;
+    5) sv down "$CF_SERVICE"; msg "Cloudflare Tunnel 停止命令已执行。";;
+    6) sv restart "$CF_SERVICE"; msg "Cloudflare Tunnel 重启命令已执行。";;
+    7) msg "Web：\n$(status "$WEB_SERVICE")\n\nTunnel：\n$(status "$CF_SERVICE")";;
+    8) "$UPDATER" >"$LOG_DIR/update.log" 2>&1 && msg "更新成功。\n\n$(tail -n 15 "$LOG_DIR/update.log")" || msg "更新失败，请查看：\n$LOG_DIR/update.log";;
+    9) "$ROLLBACK" >"$LOG_DIR/rollback.log" 2>&1 && msg "回滚命令已执行。" || msg "回滚失败，请查看日志。";;
+    10) dialog --title "Web 日志（UTF-8 中文）" --tailbox "${LOG_DIR}/web.log" 22 100;;
+    11) dialog --title "Cloudflare Tunnel 日志（UTF-8 中文）" --tailbox "${LOG_DIR}/cloudflared.log" 22 100;;
+    12) exit 0;;
+  esac
+done
