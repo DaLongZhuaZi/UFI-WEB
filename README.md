@@ -22,6 +22,8 @@ mkdir -p ~/services/ufi-web/{releases,updater}
 
 Cloudflare Tunnel 的 origin 使用 `http://127.0.0.1:3000`。
 
+更新器会把最近成功的下载线路保存到 `$HOME/services/ufi-web/.download-source`，下次优先使用该线路；失败后自动切换并更新记忆。该文件只保存线路地址，不包含任何凭据。
+
 ## Cloudflare Tunnel 与 TUI
 
 Cloudflare Tunnel 作为独立的 `cloudflared` runit 服务运行。你可以使用 Cloudflare 提供的 token 模式；token 只放在设备本地，不需要 `config.yml`：

@@ -6,17 +6,27 @@ REPO="${GITHUB_REPO:-DaLongZhuaZi/UFI-WEB}"
 RELEASE_BASE="https://github.com/$REPO/releases/latest/download"
 PREFIXES=("" "https://gh-proxy.com/" "https://ghproxy.net/" "https://ghfast.top/")
 RELEASES="$BASE/releases"; TMP="$BASE/.tmp"; LOG_DIR="$BASE/logs"
+SOURCE_STATE="$BASE/.download-source"
 mkdir -p "$RELEASES" "$TMP" "$LOG_DIR"
 log() { printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S%z')" "$*" | tee -a "$LOG_DIR/update.log"; }
 download() {
-  local relative="$1" destination="$2" prefix url attempt
-  rm -f "$destination.part"
+  local relative="$1" destination="$2" prefix url attempt remembered
+  local -a ordered=()
+  remembered=""
+  test -f "$SOURCE_STATE" && remembered="$(head -n 1 "$SOURCE_STATE" | tr -d '\r\n')"
+  if test -n "$remembered"; then ordered+=("$remembered"); fi
   for prefix in "${PREFIXES[@]}"; do
+    test "$prefix" = "$remembered" && continue
+    ordered+=("$prefix")
+  done
+  rm -f "$destination.part"
+  for prefix in "${ordered[@]}"; do
     url="${prefix}${RELEASE_BASE}/${relative}"
     log "尝试下载：$url"
     for attempt in 1 2; do
       if curl -fL --connect-timeout 6 --max-time 180 --speed-time 15 --speed-limit 1024 --retry 1 --retry-delay 2 --retry-all-errors -o "$destination.part" "$url"; then
         mv "$destination.part" "$destination"
+        printf '%s\n' "$prefix" > "$SOURCE_STATE"
         log "下载成功：$relative"
         return 0
       fi
