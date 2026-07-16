@@ -1,6 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -Eeuo pipefail
 BASE="${BASE:-$HOME/services/ufi-web}"
+ENV_FILE="${UFI_WEB_ENV:-$HOME/.config/ufi-web/web.env}"
+test ! -f "$ENV_FILE" || . "$ENV_FILE"
+CF_ENV_FILE="${CLOUDFLARED_ENV:-$HOME/.config/ufi-web/cloudflared.env}"
+test ! -f "$CF_ENV_FILE" || . "$CF_ENV_FILE"
 cd "$BASE/current"
 mkdir -p "$BASE/logs"
 export APP_ROOT="$PWD" PUBLIC_DIR="$PWD/public" PORT="${PORT:-3000}" HOST="${HOST:-0.0.0.0}" APP_VERSION="$(basename "$PWD")"

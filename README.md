@@ -63,3 +63,13 @@ cp deploy/tui/ufi "$PREFIX/bin/ufi"
 chmod +x "$PREFIX/bin/ufi"
 ufi
 ```
+
+Web 页面默认显示本地 Tunnel 服务状态、Tunnel ID、Account ID 和最近日志。若要显示 Cloudflare 远程隧道名称、状态、创建时间和连接信息，在设备本地创建 `~/.config/ufi-web/web.env`：
+
+```bash
+export CLOUDFLARE_API_TOKEN="只读API Token"
+export CLOUDFLARE_ACCOUNT_ID="可选，通常可从Tunnel Token解析"
+export CLOUDFLARE_TUNNEL_ID="可选，通常可从Tunnel Token解析"
+```
+
+API Token 只授予 `Account / Cloudflare Tunnel / Read`，并执行 `chmod 600 ~/.config/ufi-web/web.env`。该文件不会上传到 GitHub，服务端也不会将 API Token 或 Tunnel Token返回给网页。
