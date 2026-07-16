@@ -18,7 +18,14 @@ curl -fsSL "${AUTH[@]}" -o "$TMP/$ARCHIVE" "$URL"; curl -fsSL "${AUTH[@]}" -o "$
 mv "$TMP/$TAG" "$TARGET"
 (cd "$TARGET" && npm install --omit=dev --ignore-scripts)
 OLD="$(readlink "$BASE/current" 2>/dev/null || true)"; test -n "$OLD" && ln -sfn "$OLD" "$BASE/previous"
-ln -sfn "$TARGET" "$BASE/current"; sv restart ufi-web
+ln -sfn "$TARGET" "$BASE/current"
+SERVICE_DIR="${SERVICE_DIR:-$PREFIX/var/service/ufi-web}"
+if test ! -d "$SERVICE_DIR"; then
+  echo "Release installed, but service directory does not exist: $SERVICE_DIR"
+  echo "Install deploy/service/run there, chmod +x it, then run: sv up ufi-web"
+  exit 0
+fi
+sv restart ufi-web
 sleep 2
 curl -fsS "http://127.0.0.1:${PORT:-3000}/health" >/dev/null || { echo 'Health check failed, rolling back'; "$BASE/updater/rollback.sh"; exit 1; }
 echo "Updated to $TAG"
