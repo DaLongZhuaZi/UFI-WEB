@@ -16,6 +16,7 @@ rm -rf "$TMP/$TAG"; mkdir -p "$TMP/$TAG"
 curl -fsSL "${AUTH[@]}" -o "$TMP/$ARCHIVE" "$URL"; curl -fsSL "${AUTH[@]}" -o "$TMP/$SHA" "$SHA_URL"
 (cd "$TMP" && sha256sum -c "$SHA"); tar -xzf "$TMP/$ARCHIVE" -C "$TMP/$TAG"
 mv "$TMP/$TAG" "$TARGET"
+(cd "$TARGET" && npm install --omit=dev --ignore-scripts)
 OLD="$(readlink "$BASE/current" 2>/dev/null || true)"; test -n "$OLD" && ln -sfn "$OLD" "$BASE/previous"
 ln -sfn "$TARGET" "$BASE/current"; sv restart ufi-web
 sleep 2

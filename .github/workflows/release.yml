@@ -13,6 +13,6 @@ jobs:
         with: { node-version: 22 }
       - run: npm install
       - run: npm run build
-      - run: mkdir -p artifact/public && cp -R apps/web/dist/. artifact/public/ && cp -R apps/server/dist artifact/server-dist && cp apps/server/package.json artifact/server-package.json && tar -czf ufi-web-${GITHUB_REF_NAME}.tar.gz -C artifact . && sha256sum ufi-web-${GITHUB_REF_NAME}.tar.gz > ufi-web-${GITHUB_REF_NAME}.tar.gz.sha256
+      - run: mkdir -p artifact/public && cp -R apps/web/dist/. artifact/public/ && cp -R apps/server/dist artifact/server-dist && cp apps/server/package.json artifact/package.json && tar -czf ufi-web-${GITHUB_REF_NAME}.tar.gz -C artifact . && sha256sum ufi-web-${GITHUB_REF_NAME}.tar.gz > ufi-web-${GITHUB_REF_NAME}.tar.gz.sha256
       - uses: softprops/action-gh-release@v2
         with: { files: "ufi-web-${{ github.ref_name }}.tar.gz\nufi-web-${{ github.ref_name }}.tar.gz.sha256" }
