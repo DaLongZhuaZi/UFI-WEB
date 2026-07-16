@@ -1,0 +1,10 @@
+{
+  "name": "ufi-web-server",
+  "private": true,
+  "workspaces": ["apps/*", "shared"],
+  "scripts": {
+    "dev": "npm run dev -w apps/server",
+    "build": "npm run build -w apps/web && npm run build -w apps/server",
+    "test": "npm run typecheck -w apps/server"
+  }
+}

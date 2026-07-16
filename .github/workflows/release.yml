@@ -1,0 +1,18 @@
+name: Build and Release
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - run: npm run build
+      - run: mkdir -p artifact/public && cp -R apps/web/dist/. artifact/public/ && cp -R apps/server/dist artifact/server-dist && cp apps/server/package.json artifact/server-package.json && tar -czf ufi-web-${GITHUB_REF_NAME}.tar.gz -C artifact . && sha256sum ufi-web-${GITHUB_REF_NAME}.tar.gz > ufi-web-${GITHUB_REF_NAME}.tar.gz.sha256
+      - uses: softprops/action-gh-release@v2
+        with: { files: "ufi-web-${{ github.ref_name }}.tar.gz\nufi-web-${{ github.ref_name }}.tar.gz.sha256" }
